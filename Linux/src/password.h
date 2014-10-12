@@ -32,6 +32,7 @@ typedef enum {UNINIT, DEC, ENC} encryptmode_t;
 #define AESCRYPT_READPWD_FGETC       -5
 #define AESCRYPT_READPWD_TOOLONG     -6
 #define AESCRYPT_READPWD_NOMATCH     -7
+#define AESCRYPT_READPWD_ICONV       -8
 
 /*
  * Function Prototypes

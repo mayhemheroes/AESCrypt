@@ -949,7 +949,6 @@ int main(int argc, char *argv[])
     FILE *outfp = NULL;
     encryptmode_t mode=UNINIT;
     char *infile = NULL;
-    unsigned char pass_input[MAX_PASSWD_BUF];
     unsigned char pass[MAX_PASSWD_BUF];
     int file_count = 0;
     char outfile[1024];
@@ -1074,7 +1073,7 @@ int main(int argc, char *argv[])
     /* Prompt for password if not provided on the command line */
     if (passlen == 0)
     {
-        passlen = read_password(pass_input, mode);
+        passlen = read_password(pass, mode);
 
         switch (passlen)
         {
@@ -1088,6 +1087,7 @@ int main(int argc, char *argv[])
             case AESCRYPT_READPWD_TCSETATTR:
             case AESCRYPT_READPWD_FGETC:
             case AESCRYPT_READPWD_TOOLONG:
+            case AESCRYPT_READPWD_ICONV:
                 fprintf(stderr, "Error in read_password: %s.\n",
                         read_password_error(passlen));
                 cleanup(outfile);
@@ -1098,18 +1098,6 @@ int main(int argc, char *argv[])
                 return -1;
         }
 
-        passlen = passwd_to_utf16(  pass_input,
-                                    strlen((char*)pass_input),
-                                    MAX_PASSWD_LEN,
-                                    pass);
-
-        if (passlen < 0)
-        {
-            cleanup(outfile);
-            /* For security reasons, erase the password */
-            memset_secure(pass, 0, MAX_PASSWD_BUF);
-            return -1;
-        }
     }
 
     file_count = argc - optind;
