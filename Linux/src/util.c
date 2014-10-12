@@ -16,10 +16,12 @@
 
 #include <string.h>
 
-// explicit_bzero taken from NetBSD, modified to be a pure wrapper to
-// memset()
-// The compiler will not optimize a call to a volatile function pointer
-// so we use this function to clean up sensitive memory areas.
+/*
+ * explicit_bzero taken from NetBSD, modified to be a pure wrapper to
+ * memset()
+ * The compiler will not optimize a call to a volatile function pointer
+ * so we use this function to clean up sensitive memory areas.
+ */
 
 void *memset_secure(void *b, int c, size_t len)
 {

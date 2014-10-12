@@ -19,4 +19,4 @@
 
 void *memset_secure(void *, int, size_t);
 
-#endif // __AESCRYPT_UTIL_H__
+#endif /* __AESCRYPT_UTIL_H__ */
