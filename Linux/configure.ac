@@ -15,6 +15,7 @@
 AC_PREREQ(2.60)
 
 AC_INIT([aescrypt], [3.0.10_master])
+AC_DEFINE([AESCRYPT_VERSION_RESOURCE], [3,0,10,0], [Version in windows resource format])
 PACKAGE_RPM_RELEASE=1
 AC_SUBST([PACKAGE_RPM_RELEASE])
 
@@ -58,13 +59,29 @@ AC_ARG_ENABLE(
 
 case "$host" in
 	*-mingw*)
-		CPPFLAGS="${CPPFLAGS} -DWIN32_LEAN_AND_MEAN"
-		WIN32=yes
+		CPPFLAGS="${CPPFLAGS} -DWINDOWS_LEAN_AND_MEAN"
+		WINDOWS=yes
 		;;
 esac
 
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
+
+#
+# Libtool
+#
+ifdef(
+	[LT_INIT],
+	[
+		LT_INIT([win32-dll])
+		LT_LANG([Windows Resource])
+	],
+	[
+		AC_LIBTOOL_WIN32_DLL
+		AC_LIBTOOL_RC
+		AC_PROG_LIBTOOL
+	]
+)
 
 AC_C_CONST
 AC_TYPE_PID_T
@@ -81,7 +98,7 @@ fi
 if test "${enable_pedantic}" = "yes"; then
 	enable_strict="yes"
 	CFLAGS="${CFLAGS} -pedantic"
-	test "${WIN32}" != "yes" && CFLAGS="${CFLAGS} -ansi"
+	test "${WINDOWS}" != "yes" && CFLAGS="${CFLAGS} -ansi"
 fi
 if test "${enable_strict}" = "yes"; then
 	CFLAGS="${CFLAGS} -Wall -Wextra"
@@ -93,7 +110,7 @@ AC_SUBST([applicationsdir], ["\$(datarootdir)/applications"])
 AC_SUBST([iconsdir], ["\$(datarootdir)/icons/${PACKAGE_NAME}"])
 
 AM_CONDITIONAL([ENABLE_GUI], [test "${enable_gui}" = "yes"])
-AM_CONDITIONAL([WIN32], [test "${WIN32}" = "yes"])
+AM_CONDITIONAL([WINDOWS], [test "${WINDOWS}" = "yes"])
 
 AC_CONFIG_FILES([
 	Makefile

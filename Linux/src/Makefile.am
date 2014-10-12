@@ -43,6 +43,7 @@ aescrypt_SOURCES = \
 	password.c password.h \
 	keyfile.c keyfile.h \
 	aescrypt.h \
+	aesrandom.c aesrandom.h \
 	util.c util.h \
 	$(NULL)
 
@@ -68,3 +69,21 @@ aes_test_CPPFLAGS = \
 
 clean-local:
 	rm -f *.log *.trs
+
+if WINDOWS
+RCCOMPILE = $(RC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS)
+LTRCCOMPILE = $(LIBTOOL) --mode=compile --tag=RC $(RCCOMPILE)
+
+.rc.lo:
+	$(LTRCCOMPILE) -i "$<" -o "$@"
+
+.rc.o:
+	$(RCCOMPILE) -i "$<" -o "$@"
+
+.mc.rc:
+	$(WINDMC) "$<"
+
+aescrypt_SOURCES += aescrypt_win_resources.rc
+aescrypt_keygen_SOURCES += aescrypt_win_resources.rc
+endif
