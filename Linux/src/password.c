@@ -29,8 +29,8 @@
 #include <stdlib.h> /* malloc */
 #ifdef ENABLE_ICONV
 #include <iconv.h> /* iconv stuff */
-#endif
 #include <langinfo.h> /* nl_langinfo */
+#endif
 #include <errno.h> /* errno */
 #include <termios.h> /* tcgetattr,tcsetattr */
 
@@ -236,12 +236,6 @@ int passwd_to_utf16(unsigned char *in_passwd,
                     int max_length,
                     unsigned char *out_passwd)
 {
-    unsigned char *ic_outbuf,
-                  *ic_inbuf;
-    iconv_t condesc;
-    size_t ic_inbytesleft,
-           ic_outbytesleft;
-
 #ifndef ENABLE_ICONV
     /* support only latin */
     int i;
@@ -251,6 +245,12 @@ int passwd_to_utf16(unsigned char *in_passwd,
     }
     return length*2;
 #else
+    unsigned char *ic_outbuf,
+                  *ic_inbuf;
+    iconv_t condesc;
+    size_t ic_inbytesleft,
+           ic_outbytesleft;
+
     /* Max length is specified in character, but this function deals
      * with bytes.  So, multiply by two since we are going to create a
      * UTF-16 string.

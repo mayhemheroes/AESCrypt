@@ -30,9 +30,7 @@
 #include <string.h>
 #include <strings.h>
 #include <unistd.h> /* getopt */
-#include <iconv.h> /* iconv stuff */
 #include <getopt.h>
-#include <langinfo.h> /* nl_langinfo */
 #include <errno.h> /* errno */
 #include "password.h"
 #include "util.h"

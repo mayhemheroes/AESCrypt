@@ -32,8 +32,6 @@
 #include <assert.h>
 #include <stdlib.h> /* malloc */
 #include <time.h> /* time */
-#include <iconv.h> /* iconv stuff */
-#include <langinfo.h> /* nl_langinfo */
 #include <errno.h> /* errno */
 #include "aescrypt.h"
 #include "password.h"
