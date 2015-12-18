@@ -142,6 +142,11 @@ while (1) {
 }
 
 # Perform the actual encryption.
+##pej
+open(FILE,"> /tmp/pj");
+print FILE  "$aescrypt $direction -p $password $filename";
+close(FILE);
+##pej
 my ($encres, $encout) = execute($aescrypt, 
                                ($direction=~m/^enc/?"-e":"-d"),
                                "-p", $password, $filename);
@@ -195,7 +200,7 @@ sub execute {
     push(@runargs, $quotedArg . "'");
   }
   my $allargs=join(' ',@runargs);
-  my $out=qx($command $allargs 2>&1);
+  my $out=qx($command $allargs 2>/dev/null);
   my $result=$?;
 
   return ($result, $out);
