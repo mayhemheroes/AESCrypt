@@ -142,11 +142,6 @@ while (1) {
 }
 
 # Perform the actual encryption.
-##pej
-open(FILE,"> /tmp/pj");
-print FILE  "$aescrypt $direction -p $password $filename";
-close(FILE);
-##pej
 my ($encres, $encout) = execute($aescrypt, 
                                ($direction=~m/^enc/?"-e":"-d"),
                                "-p", $password, $filename);
