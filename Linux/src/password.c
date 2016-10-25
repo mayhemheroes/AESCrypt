@@ -30,6 +30,7 @@
 #include <errno.h> /* errno */
 #ifndef WIN32
 #ifdef ENABLE_ICONV
+#include <locale.h> /* setlocale */
 #include <iconv.h> /* iconv stuff */
 #include <langinfo.h> /* nl_langinfo */
 #endif
@@ -329,6 +330,9 @@ int passwd_to_utf16(unsigned char *in_passwd,
     ic_inbytesleft = length;
     ic_outbytesleft = max_length;
     ic_outbuf = out_passwd;
+
+    /* Set the locale based on the current environment */
+    setlocale(LC_CTYPE,"");
 
     if ((condesc = iconv_open("UTF-16LE", nl_langinfo(CODESET))) ==
         (iconv_t)(-1))

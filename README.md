@@ -1,7 +1,8 @@
 # AES Crypt
 
-This is the official source repository for the AES Crypt software
-available from www.aescrypt.com.
+This is a branch of the soure repository for the AES Crypt software
+available from www.aescrypt.com.  This branch has a few more build options
+than the master code available from aescrypt.com directly.
 
 AES Crypt was initially developed for Windows and then later ported to Linux.
 Other versions of the software, including Mac, Java, Android, and iOS, were

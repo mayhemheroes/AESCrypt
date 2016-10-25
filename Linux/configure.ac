@@ -14,8 +14,8 @@
 
 AC_PREREQ(2.60)
 
-AC_INIT([aescrypt], [3.0.10_master])
-AC_DEFINE([AESCRYPT_VERSION_RESOURCE], [3,0,10,0], [Version in windows resource format])
+AC_INIT([aescrypt], [3.0.11_master])
+AC_DEFINE([AESCRYPT_VERSION_RESOURCE], [3,0,11,0], [Version in windows resource format])
 PACKAGE_RPM_RELEASE=1
 AC_SUBST([PACKAGE_RPM_RELEASE])
 
