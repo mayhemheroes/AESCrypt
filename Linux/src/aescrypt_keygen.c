@@ -167,7 +167,7 @@ void cleanup(const char *outfile)
  */
 int main(int argc, char *argv[])
 {
-    int rc=0;
+    int option;
     int passlen=0;
     FILE *outfp = NULL;
     char outfile[1024];
@@ -176,9 +176,9 @@ int main(int argc, char *argv[])
     unsigned char bom[2];
     int password_acquired = 0;
 
-    while ((rc = getopt(argc, argv, "vhg:p:o:")) != -1)
+    while ((option = getopt(argc, argv, "vhg:p:o:")) != -1)
     {
-        switch (rc)
+        switch (option)
         {
             case 'h':
                 usage(argv[0]);
@@ -223,7 +223,8 @@ int main(int argc, char *argv[])
                 password_acquired = 1;
                 break;
             default:
-                fprintf(stderr, "Error: Unknown option '%c'\n", rc);
+                fprintf(stderr, "Error: Unknown option '%c'\n", option);
+                return -1;
         }
     }
     
@@ -316,5 +317,5 @@ int main(int argc, char *argv[])
     /* For security reasons, erase the password */
     memset_secure(pass, 0, MAX_PASSWD_BUF);
 
-    return rc;
+    return 0;
 }
