@@ -1,7 +1,7 @@
 /*
  * aescrypt.h
  *
- * Copyright (C) 2007, 2008, 2009, 2013
+ * Copyright (C) 2007-2017
  *
  * This software is licensed as "freeware."  Permission to distribute
  * this software in source and binary forms is hereby granted without a
@@ -14,8 +14,8 @@
  *
  */
 
-#ifndef __AESCRYPT_H__
-#define __AESCRYPT_H__
+#ifndef AESCRYPT_H
+#define AESCRYPT_H
 
 #include "aes.h"
 #include "sha256.h"
@@ -28,4 +28,4 @@ typedef struct {
 
 typedef unsigned char sha256_t[32];
 
-#endif /* __AESCRYPT_H__ */
+#endif /* AESCRYPT_H */

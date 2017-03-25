@@ -1,6 +1,6 @@
 /*
  *  AES Crypt for Linux
- *  Copyright (C) 2007-2015
+ *  Copyright (C) 2007-2017
  *
  *  Contributors:
  *      Glenn Washburn <crass@berlios.de>
@@ -28,11 +28,12 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <unistd.h>  /* getopt */
 #include <getopt.h>
 #include <assert.h>
-#include <stdlib.h> /* malloc */
-#include <time.h> /* time */
-#include <errno.h> /* errno */
+#include <stdlib.h>  /* malloc */
+#include <time.h>    /* time */
+#include <errno.h>   /* errno */
 #include "aescrypt.h"
 #include "password.h"
 #include "keyfile.h"
@@ -150,7 +151,7 @@ int encrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
 
         sprintf((char *)tag_buffer, "%s %s", PACKAGE_NAME, PACKAGE_VERSION);
         j = strlen((char *)tag_buffer);
-        if (fwrite(tag_buffer, 1, j, outfp) != (size_t)j)
+        if (fwrite(tag_buffer, 1, j, outfp) != j)
         {
             fprintf(stderr, "Error: Could not write tag to AES file (3)\n");
             aesrandom_close(aesrand);
@@ -714,9 +715,7 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
 
     while(!reached_eof)
     {
-        /*
-         * Check to see if the head of the buffer is past the ring buffer
-         */
+        /* Check to see if the head of the buffer is past the ring buffer */
         if (head == (buffer + 64))
         {
             head = buffer;
@@ -1099,6 +1098,18 @@ int main(int argc, char *argv[])
                 return -1;
         }
 
+        passlen = passwd_to_utf16(  pass,
+                                    strlen((char*)pass),
+                                    MAX_PASSWD_LEN,
+                                    pass);
+
+        if (passlen < 0)
+        {
+            cleanup(outfile);
+            /* For security reasons, erase the password */
+            memset_secure(pass, 0, MAX_PASSWD_BUF);
+            return -1;
+        }
     }
 
     file_count = argc - optind;

@@ -1,6 +1,6 @@
 /*
  * AES Crypt for Linux
- * Copyright (C) 2007, 2008, 2009, 2013
+ * Copyright (C) 2007-2017
  *
  * Contributors:
  *     Glenn Washburn <crass@berlios.de>
@@ -25,13 +25,13 @@
 #include <string.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <unistd.h> /* getopt */
-#include <stdlib.h> /* malloc */
-#include <errno.h> /* errno */
+#include <unistd.h>   /* getopt */
+#include <stdlib.h>   /* malloc */
+#include <errno.h>    /* errno */
 #ifndef WIN32
-#ifdef ENABLE_ICONV
-#include <locale.h> /* setlocale */
-#include <iconv.h> /* iconv stuff */
+#ifndef ENABLE_ICONV
+#include <locale.h>   /* setlocale */
+#include <iconv.h>    /* iconv */
 #include <langinfo.h> /* nl_langinfo */
 #endif
 #include <termios.h> /* tcgetattr,tcsetattr */
@@ -342,9 +342,9 @@ int passwd_to_utf16(unsigned char *in_passwd,
     }
 
     if (iconv(condesc,
-              (char **) &ic_inbuf,
+              (char ** const) &ic_inbuf,
               &ic_inbytesleft,
-              (char **) &ic_outbuf,
+              (char ** const) &ic_outbuf,
               &ic_outbytesleft) == (size_t) -1)
     {
         switch (errno)
@@ -355,9 +355,13 @@ int passwd_to_utf16(unsigned char *in_passwd,
                 return -1;
                 break;
             default:
-                /*~ printf("EILSEQ(%d), EINVAL(%d), %d\n", EILSEQ, EINVAL, errno);*/
-                fprintf(stderr,
-                        "Error: Invalid or incomplete multibyte sequence\n");
+                /*
+                printf("\nEILSEQ(%d), EINVAL(%d), %d\n",
+                       EILSEQ,
+                       EINVAL,
+                       errno);
+                */
+                perror("Password conversion error");
                 iconv_close(condesc);
                 return -1;
         }

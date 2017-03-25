@@ -1,6 +1,6 @@
 /*
  *  AES Crypt Key File Generator
- *  Copyright (C) 2007-2014
+ *  Copyright (C) 2007-2017
  *  Paul E. Jones <paulej@packetizer.com>
  *
  * This software is licensed as "freeware."  Permission to distribute
@@ -29,9 +29,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
-#include <unistd.h> /* getopt */
+#include <unistd.h>   /* getopt */
 #include <getopt.h>
-#include <errno.h> /* errno */
+#include <errno.h>    /* errno */
 #include "password.h"
 #include "util.h"
 
