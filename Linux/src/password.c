@@ -29,7 +29,7 @@
 #include <stdlib.h>   /* malloc */
 #include <errno.h>    /* errno */
 #ifndef WIN32
-#ifndef ENABLE_ICONV
+#ifdef ENABLE_ICONV
 #include <locale.h>   /* setlocale */
 #include <iconv.h>    /* iconv */
 #include <langinfo.h> /* nl_langinfo */
