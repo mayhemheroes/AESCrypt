@@ -18,3 +18,12 @@ Package maintainers can create a tarball using the following command:
 ```
 make dist 
 ```
+
+## CMake build
+
+    mkdir build
+    cd build
+    cmake ../
+    make
+
+
