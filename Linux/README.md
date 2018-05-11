@@ -1,7 +1,10 @@
 # AES Crypt (Linux source code)
 
 The Linux source code in the git respository is intended for use with
-"The Autotools".  Before you can build the software, you need to run the
+"The Autotools". This includes the following packages: autoconf; automake; and, libtool.
+Install these from your distro packages.
+
+Before you can build the software, you need to run the
 following command:
 
 ```
