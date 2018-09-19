@@ -3,8 +3,8 @@ Name:		@PACKAGE_NAME@
 Version:	@PACKAGE_VERSION@
 Release:	@PACKAGE_RPM_RELEASE@%{?dist}
 License:	LGPLv2+ BSD
-URL:		http://www.aescrypt.com/
-Source:		http://www.aescrypt.com/download/v3/%{name}-%{version}.tar.gz
+URL:		https://www.aescrypt.com/
+Source:		https://www.aescrypt.com/download/v3/%{name}-%{version}.tar.gz
 Group:		Tools/Encryption
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -48,3 +48,5 @@ make %{?_smp_mflags} install DESTDIR="%{buildroot}"
 %changelog
 * Sat Feb 23 2013 Alon Bar-Lev <alonbl@redhat.com> - 2.0.6b-1
 - Initial write.
+* Wed Sep 19 2018 Alon Bar-Lev <alonbl@redhat.com> - 2.0.6b-1
+- Updated URLs

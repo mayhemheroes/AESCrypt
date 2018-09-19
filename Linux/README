@@ -24,7 +24,7 @@ BUT NOT LIMITED TO, LOSS OF DATA OR DATA BEING RENDERED INACCURATE.
 
 The explicitly excluded files listed above are licensed under the
 GNU Public License.  The license covering those files can be found here:
-http://www.gnu.org/licenses/gpl-2.0.txt
+https://www.gnu.org/licenses/gpl-2.0.txt
 
 2. Installing
 
@@ -55,7 +55,7 @@ a C compiler and tools installed.  It should compile cleanly
 and without warnings or errors.  If you get any, feel free to ask
 about it on the discussion forum:
 
-   http://forums.packetizer.com/viewforum.php?f=72
+   https://forums.packetizer.com/viewforum.php?f=72
 
 3. AES Crypt Key File Format
 
