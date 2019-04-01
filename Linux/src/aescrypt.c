@@ -190,21 +190,11 @@ int encrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
      * We will use an initialization vector comprised of the current time
      * process ID, and random data, all hashed together with SHA-256.
      */
-    current_time = time(NULL);
-    for(i = 0; i < 8; i++)
-    {
-        buffer[i] = (unsigned char)
-                        (current_time >> (i * 8));
-    }
-    process_id = getpid();
-    for(i = 0; i < 8; i++)
-    {
-        buffer[i+8] = (unsigned char)
-                        (process_id >> (i * 8));
-    }
-
     sha256_starts(  &sha_ctx);
-    sha256_update(  &sha_ctx, buffer, 16);
+    current_time = time(NULL);
+    sha256_update(  &sha_ctx, (unsigned char *)&time, sizeof(current_time));
+    process_id = getpid();
+    sha256_update(  &sha_ctx, (unsigned char *)&process_id, sizeof(process_id));
 
     for (i=0; i<256; i++)
     {
