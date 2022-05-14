@@ -1,0 +1,6 @@
+project: rnshah9/playground
+target: playground
+image: ghcr.io/rnshah9/playground:aescrypt
+
+cmds:
+  - cmd: /repo/Linux/build/src/aescrypt -e -p password @@
