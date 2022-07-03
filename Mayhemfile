@@ -2,4 +2,4 @@ project: aescrypt
 target: aescrypt
 
 cmds:
-  - cmd: /repo/Linux/build/src/aescrypt -e -p password @@
+  - cmd: /aescrypt/aescrypt -e -p password @@
