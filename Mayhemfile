@@ -2,4 +2,4 @@ project: aescrypt
 target: aescrypt
 
 cmds:
-  - cmd: /aescrypt/bin/aescrypt -e -p password @@
+  - cmd: /install/bin/aescrypt -e -p password @@
