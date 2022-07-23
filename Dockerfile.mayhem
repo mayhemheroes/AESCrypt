@@ -2,14 +2,13 @@ FROM --platform=linux/amd64 ubuntu:20.04 as builder
 
 RUN apt-get -y update && DEBIAN_FRONTEND=noninteractive apt-get install -y automake libtool clang make cmake
 
-ADD . /repo
+COPY . /repo
 WORKDIR /repo/Linux
 RUN autoreconf -ivf
 RUN mkdir ./dist
-RUN ./configure --prefix=$PWD/dist
+RUN ./configure --prefix=/install
 RUN make install 
 
 FROM ubuntu:20.04 as package
 
-RUN mkdir /aescrypt
-COPY --from=builder /repo/Linux/dist /aescrypt
+COPY --from=builder /install /install
