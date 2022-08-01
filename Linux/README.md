@@ -3,7 +3,7 @@
 The Linux source code in the git repository is intended for use with CMake or
 "The Autotools".
 
-## CMake build
+## Building with CMake
 
 Change to the Linux directory and issue the following commands to create
 a release build:
@@ -13,7 +13,7 @@ cmake -B build -S . --install-prefix=/usr -DCMAKE_BUILD_TYPE:STRING=Release
 cmake --build build --parallel
 ```
 
-The aescrypt and aescrypt_keygen binaries will be placed in the directory
+The `aescrypt` and `aescrypt_keygen` binaries will be placed in the directory
 `build/src/` once the build completes.
 
 If you wish to install the two binary files `aescrypt` and `aescrypt_keygen`,
@@ -30,7 +30,7 @@ cd build
 make test
 ```
 
-## Using Autotools
+## Building with Autotools
 
 Install these from your Linus distribution packages:
 

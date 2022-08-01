@@ -1,15 +1,22 @@
 #!/bin/bash -e
 #
 # Encrypting and decrypting text files
-#     usage: test.sh <aescrypt binary build directory>
+#     usage: test.sh [<aescrypt binary build directory>]
+#
+# If no directory is given, the script assumes aescrypt is in the
+# current working directory.  That would be the case when the software
+# is compiled using autotools.
 #
 
 if [ $# != 1 ] ; then
-    echo Missing binary directory parameter
-    exit 1
+    # Check to see if aescrypt is in the current directory
+    if [ ! -f ./aescrypt ] ; then
+        echo Missing binary directory parameter
+        exit 1
+    fi
+else
+    cd $1 || exit 1
 fi
-
-cd $1 || exit 1
 
 # Test zero-length file
 cat /dev/null > test.orig.txt
