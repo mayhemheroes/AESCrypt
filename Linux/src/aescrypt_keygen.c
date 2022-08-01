@@ -1,6 +1,6 @@
 /*
  *  AES Crypt Key File Generator
- *  Copyright (C) 2007-2017
+ *  Copyright (C) 2007-2022
  *  Paul E. Jones <paulej@packetizer.com>
  *
  * This software is licensed as "freeware."  Permission to distribute
@@ -24,6 +24,8 @@
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
+#else
+#include "version.h"
 #endif
 #include <stdlib.h>
 #include <stdio.h>
@@ -65,7 +67,7 @@ int generate_password(int length, unsigned char *password)
     unsigned char *p;
     int i, n;
     int passlen;
-    
+
     if ((length <= 0) || (length > MAX_PASSWD_LEN))
     {
         fprintf(stderr, "Invalid password length specified.\n");
@@ -89,16 +91,13 @@ int generate_password(int length, unsigned char *password)
     fclose(randfp);
 
     /* Now ensure each octet is uses the defined character set */
-    for(i = 0, p = pwtemp; i < length; i++, p++)
+    for (i = 0, p = pwtemp; i < length; i++, p++)
     {
         *p = pwchars[((int)(*p)) % 64];
     }
 
     /* Convert the password to UTF-16LE */
-    passlen = passwd_to_utf16(  pwtemp,
-                                length,
-                                MAX_PASSWD_LEN,
-                                password);
+    passlen = passwd_to_utf16(pwtemp, length, MAX_PASSWD_LEN, password);
 
     return passlen;
 }
@@ -211,10 +210,10 @@ int main(int argc, char *argv[])
                 }
                 if (optarg != 0)
                 {
-                    passlen = passwd_to_utf16(  (unsigned char*) optarg,
-                                                strlen((char *)optarg),
-                                                MAX_PASSWD_LEN,
-                                                pass);
+                    passlen = passwd_to_utf16((unsigned char *) optarg,
+                                              strlen((char *) optarg),
+                                              MAX_PASSWD_LEN,
+                                              pass);
                     if (passlen < 0)
                     {
                         return -1;
@@ -227,7 +226,7 @@ int main(int argc, char *argv[])
                 return -1;
         }
     }
-    
+
     file_count = argc - optind;
     if (file_count != 1)
     {
@@ -296,7 +295,7 @@ int main(int argc, char *argv[])
         cleanup(outfile);
         return  -1;
     }
-    
+
     if (fwrite(pass, 1, passlen, outfp) != (size_t) passlen)
     {
         fprintf(stderr, "Error: Could not write password file.\n");

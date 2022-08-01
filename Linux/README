@@ -28,6 +28,9 @@ https://www.gnu.org/licenses/gpl-2.0.txt
 
 2. Installing
 
+NOTE: These instructions correspond to the official release files
+      available from aescrypt.com.
+
 Extract the source archive.  If you are reading this, you probably
 already have.  Just in case you have not, extract the files using
 a command like this:

@@ -1,0 +1,23 @@
+/*
+ *  version.h.in
+ *
+ *  Copyright (C) 2022
+ *  Paul E. Jones <paulej@packetizer.com>
+ *  All Rights Reserved
+ *
+ *  Description:
+ *      Defines version information strings that will be built into the
+ *      binary project file.
+ *
+ *  Portability Issues:
+ *      None.
+ */
+
+#ifndef VERSION_H
+#define VERSION_H
+
+static const char PACKAGE_NAME[] = "@PROJECT_NAME@";
+static const char PACKAGE_VERSION[] = "@PROJECT_VERSION@";
+static const char PACKAGE_DATE[] = "@PACKAGE_DATE@";
+
+#endif /* VERSION_H */

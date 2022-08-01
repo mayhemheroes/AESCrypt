@@ -1,7 +1,7 @@
 /*
  * password.h
  *
- * Copyright (C) 2007-2017
+ * Copyright (C) 2007-2022
  *
  * This software is licensed as "freeware."  Permission to distribute
  * this software in source and binary forms is hereby granted without a
@@ -44,8 +44,6 @@ int passwd_to_utf16(unsigned char *in_passwd,
 
 const char* read_password_error(int error);
 
-int read_password(unsigned char* buffer,
-                  encryptmode_t mode);
-
+int read_password(unsigned char *buffer, encryptmode_t mode);
 
 #endif /* AESCRYPT_PASSWORD_H */

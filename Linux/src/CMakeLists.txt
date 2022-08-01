@@ -1,25 +1,34 @@
-cmake_minimum_required(VERSION 3.9)
-
 string(TIMESTAMP PACKAGE_DATE %Y-%m-%dT%H:%M:%SZ UTC)
-add_definitions( -DPACKAGE_NAME="aescrypt" )
-add_definitions( -DPACKAGE_VERSION="1.0.0" )
-add_definitions( -DPACKAGE_DATE="${PACKAGE_DATE}" )
 
-set( HEADER_FILES
-   password.h
-   aes.h
-   aesrandom.h
-   sha256.h
-   util.h
-   keyfile.h )
+# Build a version number into the binary library
+configure_file(version.h.in version.h @ONLY)
 
-set( COMMON_SOURCE_FILES
+add_executable(aescrypt
+   aescrypt.c
    aes.c
    aesrandom.c
    sha256.c
    util.c
    keyfile.c
-   password.c )
+   password.c)
+target_compile_definitions(aescrypt PRIVATE ENABLE_ICONV)
 
-add_executable( aescrypt aescrypt.c ${COMMON_SOURCE_FILES} )
-add_executable( aescrypt_keygen aescrypt_keygen.c ${COMMON_SOURCE_FILES} )
+target_include_directories(aescrypt
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+
+add_executable(aescrypt_keygen
+   aescrypt_keygen.c
+   aes.c
+   aesrandom.c
+   sha256.c
+   util.c
+   keyfile.c
+   password.c)
+
+target_include_directories(aescrypt_keygen
+   PRIVATE
+       $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+
+# Install target and associated include files
+install(TARGETS aescrypt aescrypt_keygen)
