@@ -19,7 +19,7 @@ MAINTAINERCLEANFILES = \
 TESTS = \
 	sha.test \
 	aes.test \
-	file-test.sh \
+	../test/test.sh \
 	$(NULL)
 
 bin_PROGRAMS = \
@@ -33,7 +33,7 @@ noinst_PROGRAMS = \
 	$(NULL)
 
 dist_noinst_SCRIPTS = \
-	file-test.sh \
+	../test/test.sh \
 	$(NULL)
 
 aescrypt_SOURCES = \
