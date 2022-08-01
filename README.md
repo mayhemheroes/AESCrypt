@@ -3,6 +3,8 @@
 NOTE: This repository is *retired*.  Code is still under development and posted at
 https://www.aescrypt.com/.
 
+<hr/>
+
 This is a branch of the soure repository for the AES Crypt software
 available from www.aescrypt.com.  This branch has a few more build options
 than the master code available from aescrypt.com directly.
