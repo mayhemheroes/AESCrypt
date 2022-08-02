@@ -181,14 +181,17 @@ int main(int argc, char *argv[])
         {
             case 'h':
                 usage(argv[0]);
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return 0;
             case 'v':
                 version(argv[0]);
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return 0;
             case 'g':
                 if (password_acquired)
                 {
                     fprintf(stderr, "Error: password supplied twice\n");
+                    memset_secure(pass, 0, MAX_PASSWD_BUF);
                     return -1;
                 }
                 if (optarg != 0)
@@ -197,6 +200,7 @@ int main(int argc, char *argv[])
                                                 pass);
                     if (passlen < 0)
                     {
+                        memset_secure(pass, 0, MAX_PASSWD_BUF);
                         return -1;
                     }
                 }
@@ -206,6 +210,7 @@ int main(int argc, char *argv[])
                 if (password_acquired)
                 {
                     fprintf(stderr, "Error: password supplied twice\n");
+                    memset_secure(pass, 0, MAX_PASSWD_BUF);
                     return -1;
                 }
                 if (optarg != 0)
@@ -223,6 +228,7 @@ int main(int argc, char *argv[])
                 break;
             default:
                 fprintf(stderr, "Error: Unknown option '%c'\n", option);
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return -1;
         }
     }
@@ -232,7 +238,6 @@ int main(int argc, char *argv[])
     {
         fprintf(stderr, "Error: A single output file must be specified.\n");
         usage(argv[0]);
-        /* For security reasons, erase the password */
         memset_secure(pass, 0, MAX_PASSWD_BUF);
         return -1;
     }
@@ -252,6 +257,7 @@ int main(int argc, char *argv[])
         {
             case 0: /* no password in input */
                 fprintf(stderr, "Error: No password supplied.\n");
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return -1;
             case AESCRYPT_READPWD_FOPEN:
             case AESCRYPT_READPWD_FILENO:
@@ -262,10 +268,21 @@ int main(int argc, char *argv[])
             case AESCRYPT_READPWD_ICONV:
                 fprintf(stderr, "Error in read_password: %s.\n",
                         read_password_error(passlen));
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return -1;
             case AESCRYPT_READPWD_NOMATCH:
                 fprintf(stderr, "Error: Passwords don't match.\n");
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return -1;
+        }
+
+        // We should never get here, but "just in case"
+        if (passlen < 0)
+        {
+            fprintf(stderr, "Error: unexpected problem reading password\n");
+            cleanup(outfile);
+            memset_secure(pass, 0, MAX_PASSWD_BUF);
+            return -1;
         }
     }
 
@@ -277,7 +294,6 @@ int main(int argc, char *argv[])
     {
         fprintf(stderr, "Error opening output file %s : ", outfile);
         perror("");
-        /* For security reasons, erase the password */
         memset_secure(pass, 0, MAX_PASSWD_BUF);
         return  -1;
     }
