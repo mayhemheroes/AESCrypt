@@ -242,11 +242,14 @@ int read_password(unsigned char* buffer, encryptmode_t mode)
         /* Check if passwords match */
         match = strcmp((char *) pwd, (char *) pwd_confirm);
 
-        /* Securely erase the memory for the confirmed password */
+        /* For security reasons, erase confirm buffer */
         memset_secure(pwd_confirm, 0, MAX_PASSWD_BUF);
 
-        /* For security reasons, erase the password */
-        if (match != 0) return AESCRYPT_READPWD_NOMATCH;
+        if (match != 0)
+        {
+            memset_secure(pwd, 0, MAX_PASSWD_BUF);
+            return AESCRYPT_READPWD_NOMATCH;
+        }
     }
 
 #ifdef WIN32

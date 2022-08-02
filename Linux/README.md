@@ -55,3 +55,9 @@ Package maintainers can create a tarball using the following command:
 ```bash
 make dist
 ```
+
+To perform automated tests, run:
+
+```bash
+make check
+```

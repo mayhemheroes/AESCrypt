@@ -1133,7 +1133,6 @@ int main(int argc, char *argv[])
                 "multiple input files\n");
         usage(argv[0]);
         cleanup(outfile);
-        /* For security reasons, erase the password */
         memset_secure(pass, 0, MAX_PASSWD_BUF);
         return -1;
     }
@@ -1155,7 +1154,6 @@ int main(int argc, char *argv[])
                         "files\n");
                 usage(argv[0]);
                 cleanup(outfile);
-                /* For security reasons, erase the password */
                 memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return -1;
             }
@@ -1174,7 +1172,6 @@ int main(int argc, char *argv[])
             fprintf(stderr, "Error opening input file %s : ", infile);
             perror("");
             cleanup(outfile);
-            /* For security reasons, erase the password */
             memset_secure(pass, 0, MAX_PASSWD_BUF);
             return -1;
         }
@@ -1193,7 +1190,6 @@ int main(int argc, char *argv[])
                     fprintf(stderr, "Error opening output file %s : ", outfile);
                     perror("");
                     cleanup(outfile);
-                    /* For security reasons, erase the password */
                     memset_secure(pass, 0, MAX_PASSWD_BUF);
                     return -1;
                 }
@@ -1217,7 +1213,6 @@ int main(int argc, char *argv[])
                     fprintf(stderr, "Error opening output file %s : ", outfile);
                     perror("");
                     cleanup(outfile);
-                    /* For security reasons, erase the password */
                     memset_secure(pass, 0, MAX_PASSWD_BUF);
                     return -1;
                 }
@@ -1251,7 +1246,6 @@ int main(int argc, char *argv[])
         if (rc)
         {
             cleanup(outfile);
-            /* For security reasons, erase the password */
             memset_secure(pass, 0, MAX_PASSWD_BUF);
             return -1;
         }
