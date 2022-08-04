@@ -1,6 +1,6 @@
 /*
  *  AES Crypt for Linux
- *  Copyright (C) 2007-2017
+ *  Copyright (C) 2007-2022
  *
  *  Contributors:
  *      Glenn Washburn <crass@berlios.de>
@@ -20,6 +20,8 @@
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
+#else
+#include "version.h"
 #endif
 #include <stdio.h>
 #include <string.h>
@@ -84,11 +86,11 @@ int encrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
      * source of data.
      */
     memset(iv_key, 0, 48);
-    for (i=0; i<48; i+=16)
+    for (i = 0; i < 48; i += 16)
     {
         memset(buffer, 0, 32);
         sha256_starts(&sha_ctx);
-        for(j=0; j<256; j++)
+        for (j = 0; j < 256; j++)
         {
             if ((bytes_read = aesrandom_read(aesrand, buffer, 32)) != 32)
             {
@@ -100,7 +102,7 @@ int encrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
             sha256_update(&sha_ctx, buffer, 32);
         }
         sha256_finish(&sha_ctx, digest);
-        memcpy(iv_key+i, digest, 16);
+        memcpy(iv_key + i, digest, 16);
     }
 
     /*
@@ -190,11 +192,11 @@ int encrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
      * We will use an initialization vector comprised of the current time
      * process ID, and random data, all hashed together with SHA-256.
      */
-    sha256_starts(  &sha_ctx);
+    sha256_starts(&sha_ctx);
     current_time = time(NULL);
-    sha256_update(  &sha_ctx, (unsigned char *)&time, sizeof(current_time));
+    sha256_update(&sha_ctx, (unsigned char *) &time, sizeof(current_time));
     process_id = getpid();
-    sha256_update(  &sha_ctx, (unsigned char *)&process_id, sizeof(process_id));
+    sha256_update(&sha_ctx, (unsigned char *) &process_id, sizeof(process_id));
 
     for (i=0; i<256; i++)
     {
@@ -204,12 +206,10 @@ int encrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
             aesrandom_close(aesrand);
             return -1;
         }
-        sha256_update(  &sha_ctx,
-                        buffer,
-                        32);
+        sha256_update(&sha_ctx, buffer, 32);
     }
 
-    sha256_finish(  &sha_ctx, digest);
+    sha256_finish(&sha_ctx, digest);
 
     memcpy(IV, digest, 16);
 
@@ -222,19 +222,16 @@ int encrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
         fprintf(stderr, "Error: Could not write out initialization vector\n");
         return -1;
     }
-    
+
     /* Hash the IV and password 8192 times */
     memset(digest, 0, 32);
     memcpy(digest, IV, 16);
-    for(i=0; i<8192; i++)
+    for (i = 0; i < 8192; i++)
     {
-        sha256_starts(  &sha_ctx);
-        sha256_update(  &sha_ctx, digest, 32);
-        sha256_update(  &sha_ctx,
-                        passwd,
-                        (unsigned long)passlen);
-        sha256_finish(  &sha_ctx,
-                        digest);
+        sha256_starts(&sha_ctx);
+        sha256_update(&sha_ctx, digest, 32);
+        sha256_update(&sha_ctx, passwd, (unsigned long) passlen);
+        sha256_finish(&sha_ctx, digest);
     }
 
     /* Set the AES encryption key */
@@ -248,7 +245,7 @@ int encrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
     memset(ipad, 0x36, 64);
     memset(opad, 0x5C, 64);
 
-    for(i=0; i<32; i++)
+    for (i = 0; i < 32; i++)
     {
         ipad[i] ^= digest[i];
         opad[i] ^= digest[i];
@@ -261,7 +258,7 @@ int encrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
      * Encrypt the IV and key used to encrypt the plaintext file,
      * writing that encrypted text to the output file.
      */
-    for(i=0; i<48; i+=16)
+    for (i = 0; i < 48; i += 16)
     {
         /*
          * Place the next 16 octets of IV and key buffer into
@@ -273,14 +270,14 @@ int encrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
          * XOR plain text block with previous encrypted
          * output (i.e., use CBC)
          */
-        for(j=0; j<16; j++)
+        for (j = 0; j < 16; j++)
         {
             buffer[j] ^= IV[j];
         }
 
         /* Encrypt the contents of the buffer */
         aes_encrypt(&aes_ctx, buffer, buffer);
-        
+
         /* Concatenate the "text" as we compute the HMAC */
         sha256_update(&sha_ctx, buffer, 16);
 
@@ -290,7 +287,7 @@ int encrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
             fprintf(stderr, "Error: Could not write iv_key data\n");
             return -1;
         }
-        
+
         /* Update the IV (CBC mode) */
         memcpy(IV, buffer, 16);
     }
@@ -309,7 +306,7 @@ int encrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
     }
 
     /* Re-load the IV and encryption key with the IV and
-     * key to now encrypt the datafile.  Also, reset the HMAC
+     * key to now encrypt the data file.  Also, reset the HMAC
      * computation.
      */
     memcpy(IV, iv_key, 16);
@@ -325,7 +322,7 @@ int encrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
     memset(ipad, 0x36, 64);
     memset(opad, 0x5C, 64);
 
-    for(i=0; i<32; i++)
+    for (i = 0; i < 32; i++)
     {
         ipad[i] ^= iv_key[i+16];
         opad[i] ^= iv_key[i+16];
@@ -346,14 +343,14 @@ int encrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
          * XOR plain text block with previous encrypted
          * output (i.e., use CBC)
          */
-        for(i=0; i<16; i++)
+        for (i = 0; i < 16; i++)
         {
             buffer[i] ^= IV[i];
         }
 
         /* Encrypt the contents of the buffer */
         aes_encrypt(&aes_ctx, buffer, buffer);
-        
+
         /* Concatenate the "text" as we compute the HMAC */
         sha256_update(&sha_ctx, buffer, 16);
 
@@ -363,7 +360,7 @@ int encrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
             fprintf(stderr, "Error: Could not write to output file\n");
             return -1;
         }
-        
+
         /* Update the IV (CBC mode) */
         memcpy(IV, buffer, 16);
 
@@ -427,14 +424,14 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
     unsigned char *head, *tail;
     unsigned char ipad[64], opad[64];
     int reached_eof = 0;
-    
+
     /* Read the file header */
     if ((bytes_read = fread(&aeshdr, 1, sizeof(aeshdr), infp)) !=
          sizeof(aescrypt_hdr))
     {
         if (feof(infp))
         {
-            fprintf(stderr, "Error: Input file is too short.\n");
+            fprintf(stderr, "Error: Input file is too short\n");
         }
         else
         {
@@ -446,7 +443,12 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
     if (!(aeshdr.aes[0] == 'A' && aeshdr.aes[1] == 'E' &&
           aeshdr.aes[2] == 'S'))
     {
-        fprintf(stderr, "Error: Bad file header (not aescrypt file or is corrupted? [%x, %x, %x])\n", aeshdr.aes[0], aeshdr.aes[1], aeshdr.aes[2]);
+        fprintf(stderr,
+                "Error: Bad file header (not aescrypt file or is corrupted? "
+                "[%x, %x, %x])\n",
+                aeshdr.aes[0],
+                aeshdr.aes[1],
+                aeshdr.aes[2]);
         return -1;
     }
 
@@ -475,7 +477,7 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
             {
                 if (feof(infp))
                 {
-                    fprintf(stderr, "Error: Input file is too short.\n");
+                    fprintf(stderr, "Error: Input file is too short\n");
                 }
                 else
                 {
@@ -491,7 +493,7 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
                 {
                     if (feof(infp))
                     {
-                        fprintf(stderr, "Error: Input file is too short.\n");
+                        fprintf(stderr, "Error: Input file is too short\n");
                     }
                     else
                     {
@@ -508,7 +510,7 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
     {
         if (feof(infp))
         {
-            fprintf(stderr, "Error: Input file is too short.\n");
+            fprintf(stderr, "Error: Input file is too short\n");
         }
         else
         {
@@ -520,15 +522,12 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
     /* Hash the IV and password 8192 times */
     memset(digest, 0, 32);
     memcpy(digest, IV, 16);
-    for(i=0; i<8192; i++)
+    for (i = 0; i < 8192; i++)
     {
-        sha256_starts(  &sha_ctx);
-        sha256_update(  &sha_ctx, digest, 32);
-        sha256_update(  &sha_ctx,
-                        passwd,
-                        passlen);
-        sha256_finish(  &sha_ctx,
-                        digest);
+        sha256_starts(&sha_ctx);
+        sha256_update(&sha_ctx, digest, 32);
+        sha256_update(&sha_ctx, passwd, passlen);
+        sha256_finish(&sha_ctx, digest);
     }
 
     /* Set the AES encryption key */
@@ -541,7 +540,7 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
     memset(ipad, 0x36, 64);
     memset(opad, 0x5C, 64);
 
-    for(i=0; i<32; i++)
+    for (i = 0; i < 32; i++)
     {
         ipad[i] ^= digest[i];
         opad[i] ^= digest[i];
@@ -555,13 +554,13 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
      */
     if (aeshdr.version >= 0x01)
     {
-        for(i=0; i<48; i+=16)
+        for (i = 0; i < 48; i += 16)
         {
             if ((bytes_read = fread(buffer, 1, 16, infp)) != 16)
             {
                 if (feof(infp))
                 {
-                    fprintf(stderr, "Error: Input file is too short.\n");
+                    fprintf(stderr, "Error: Input file is too short\n");
                 }
                 else
                 {
@@ -579,9 +578,9 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
              * XOR plain text block with previous encrypted
              * output (i.e., use CBC)
              */
-            for(j=0; j<16; j++)
+            for (j = 0; j < 16; j++)
             {
-                iv_key[i+j] = (buffer[j] ^ IV[j]);
+                iv_key[i + j] = (buffer[j] ^ IV[j]);
             }
 
             /* Update the IV (CBC mode) */
@@ -599,7 +598,7 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
         {
             if (feof(infp))
             {
-                fprintf(stderr, "Error: Input file is too short.\n");
+                fprintf(stderr, "Error: Input file is too short\n");
             }
             else
             {
@@ -610,7 +609,9 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
 
         if (memcmp(digest, buffer, 32))
         {
-            fprintf(stderr, "Error: Message has been altered or password is incorrect\n");
+            fprintf(stderr,
+                    "Error: Message has been altered or password is "
+                    "incorrect\n");
             return -1;
         }
 
@@ -632,10 +633,10 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
         memset(ipad, 0x36, 64);
         memset(opad, 0x5C, 64);
 
-        for(i=0; i<32; i++)
+        for (i = 0; i < 32; i++)
         {
-            ipad[i] ^= iv_key[i+16];
-            opad[i] ^= iv_key[i+16];
+            ipad[i] ^= iv_key[i + 16];
+            opad[i] ^= iv_key[i + 16];
         }
 
         /* Wipe the IV and encryption key from memory */
@@ -644,7 +645,7 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
         sha256_starts(&sha_ctx);
         sha256_update(&sha_ctx, ipad, 64);
     }
-    
+
     /*
      * Decrypt the balance of the file
      *
@@ -663,12 +664,12 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
             /*
              * If there are less than 48 octets, the only valid count
              * is 32 for version 0 (HMAC) and 33 for version 1 or
-             * greater files ( file size modulo + HMAC)
+             * greater files (file size modulo + HMAC)
              */
             if ((aeshdr.version == 0x00 && bytes_read != 32) ||
                 (aeshdr.version >= 0x01 && bytes_read != 33))
             {
-                fprintf(stderr, "Error: Input file is corrupt (1:%u).\n",
+                fprintf(stderr, "Error: Input file is corrupt (1:%u)\n",
                         (unsigned) bytes_read);
                 return -1;
             }
@@ -693,7 +694,7 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
                  */
                 if (aeshdr.last_block_size != 0)
                 {
-                    fprintf(stderr, "Error: Input file is corrupt (2).\n");
+                    fprintf(stderr, "Error: Input file is corrupt (2)\n");
                     return -1;
                 }
             }
@@ -724,7 +725,7 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
                 if ((aeshdr.version == 0x00 && bytes_read > 0) ||
                     (aeshdr.version >= 0x01 && bytes_read != 1))
                 {
-                    fprintf(stderr, "Error: Input file is corrupt (3:%u).\n",
+                    fprintf(stderr, "Error: Input file is corrupt (3:%u)\n",
                             (unsigned) bytes_read);
                     return -1;
                 }
@@ -774,7 +775,7 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
              * XOR plain text block with previous encrypted
              * output (i.e., use CBC)
              */
-            for(i=0; i<16; i++)
+            for (i = 0; i < 16; i++)
             {
                 tail[i] ^= IV[i];
             }
@@ -795,7 +796,7 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
                 perror("Error writing decrypted block:");
                 return -1;
             }
-            
+
             /* Move the tail of the ring buffer forward */
             tail += 16;
             if (tail == (buffer+64))
@@ -844,11 +845,15 @@ int decrypt_stream(FILE *infp, FILE *outfp, unsigned char* passwd, int passlen)
     {
         if (aeshdr.version == 0x00)
         {
-            fprintf(stderr, "Error: Message has been altered or password is incorrect\n");
+            fprintf(stderr,
+                    "Error: Message has been altered or password is "
+                    "incorrect\n");
         }
         else
         {
-            fprintf(stderr, "Error: Message has been altered and should not be trusted\n");
+            fprintf(stderr,
+                    "Error: Message has been altered and should not be "
+                    "trusted\n");
         }
 
         return -1;
@@ -885,7 +890,9 @@ void usage(const char *progname)
         progname_real++;
     }
 
-    fprintf(stderr, "\nusage: %s {-e|-d} [ { -p <password> | -k <keyfile> } ] { [-o <output filename>] <file> | <file> [<file> ...] }\n\n",
+    fprintf(stderr,
+            "\nusage: %s {-e|-d} [ { -p <password> | -k <keyfile> } ] { [-o "
+            "<output filename>] <file> | <file> [<file> ...] }\n\n",
             progname_real);
 }
 
@@ -946,22 +953,25 @@ int main(int argc, char *argv[])
 
     /* Initialize the output filename */
     outfile[0] = '\0';
-    
+
     while ((rc = getopt(argc, argv, "vhdek:p:o:")) != -1)
     {
         switch (rc)
         {
             case 'h':
                 usage(argv[0]);
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return 0;
             case 'v':
                 version(argv[0]);
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return 0;
             case 'd':
                 if (mode != UNINIT)
                 {
                     fprintf(stderr, "Error: only specify one of -d or -e\n");
                     cleanup(outfile);
+                    memset_secure(pass, 0, MAX_PASSWD_BUF);
                     return -1;
                 }
                 mode = DEC;
@@ -971,6 +981,7 @@ int main(int argc, char *argv[])
                 {
                     fprintf(stderr, "Error: only specify one of -d or -e\n");
                     cleanup(outfile);
+                    memset_secure(pass, 0, MAX_PASSWD_BUF);
                     return -1;
                 }
                 mode = ENC;
@@ -980,6 +991,7 @@ int main(int argc, char *argv[])
                 {
                     fprintf(stderr, "Error: password supplied twice\n");
                     cleanup(outfile);
+                    memset_secure(pass, 0, MAX_PASSWD_BUF);
                     return -1;
                 }
                 if (optarg != 0)
@@ -989,6 +1001,7 @@ int main(int argc, char *argv[])
                         fprintf(stderr,
                                 "Error: keyfile cannot be read from stdin\n");
                         cleanup(outfile);
+                        memset_secure(pass, 0, MAX_PASSWD_BUF);
                         return -1;
                     }
 
@@ -996,6 +1009,7 @@ int main(int argc, char *argv[])
                     if (passlen < 0)
                     {
                         cleanup(outfile);
+                        memset_secure(pass, 0, MAX_PASSWD_BUF);
                         return -1;
                     }
                     password_acquired = 1;
@@ -1006,17 +1020,19 @@ int main(int argc, char *argv[])
                 {
                     fprintf(stderr, "Error: password supplied twice\n");
                     cleanup(outfile);
+                    memset_secure(pass, 0, MAX_PASSWD_BUF);
                     return -1;
                 }
                 if (optarg != 0)
                 {
-                    passlen = passwd_to_utf16(  (unsigned char*) optarg,
-                                                strlen((char *)optarg),
-                                                MAX_PASSWD_LEN,
-                                                pass);
+                    passlen = passwd_to_utf16((unsigned char *) optarg,
+                                              strlen((char *) optarg),
+                                              MAX_PASSWD_LEN,
+                                              pass);
                     if (passlen < 0)
                     {
                         cleanup(outfile);
+                        memset_secure(pass, 0, MAX_PASSWD_BUF);
                         return -1;
                     }
                     password_acquired = 1;
@@ -1034,6 +1050,7 @@ int main(int argc, char *argv[])
                     fprintf(stderr, "Error opening output file %s:", optarg);
                     perror("");
                     cleanup(outfile);
+                    memset_secure(pass, 0, MAX_PASSWD_BUF);
                     return -1;
                 }
                 strncpy(outfile, optarg, 1024);
@@ -1043,12 +1060,13 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "Error: Unknown option '%c'\n", rc);
         }
     }
-    
+
     if (optind >= argc)
     {
         fprintf(stderr, "Error: No file argument specified\n");
         usage(argv[0]);
         cleanup(outfile);
+        memset_secure(pass, 0, MAX_PASSWD_BUF);
         return -1;
     }
 
@@ -1057,6 +1075,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error: -e or -d not specified\n");
         usage(argv[0]);
         cleanup(outfile);
+        memset_secure(pass, 0, MAX_PASSWD_BUF);
         return -1;
     }
 
@@ -1068,8 +1087,9 @@ int main(int argc, char *argv[])
         switch (passlen)
         {
             case 0: /* no password in input */
-                fprintf(stderr, "Error: No password supplied.\n");
+                fprintf(stderr, "Error: No password supplied\n");
                 cleanup(outfile);
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return -1;
             case AESCRYPT_READPWD_FOPEN:
             case AESCRYPT_READPWD_FILENO:
@@ -1078,23 +1098,22 @@ int main(int argc, char *argv[])
             case AESCRYPT_READPWD_FGETC:
             case AESCRYPT_READPWD_TOOLONG:
             case AESCRYPT_READPWD_ICONV:
-                fprintf(stderr, "Error in read_password: %s.\n",
+                fprintf(stderr, "Error in read_password: %s\n",
                         read_password_error(passlen));
                 cleanup(outfile);
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return -1;
             case AESCRYPT_READPWD_NOMATCH:
-                fprintf(stderr, "Error: Passwords don't match.\n");
+                fprintf(stderr, "Error: Passwords don't match\n");
                 cleanup(outfile);
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return -1;
         }
 
-        passlen = passwd_to_utf16(  pass,
-                                    strlen((char*)pass),
-                                    MAX_PASSWD_LEN,
-                                    pass);
-
+        // We should never get here, but "just in case"
         if (passlen < 0)
         {
+            fprintf(stderr, "Error: unexpected problem reading password\n");
             cleanup(outfile);
             /* For security reasons, erase the password */
             memset_secure(pass, 0, MAX_PASSWD_BUF);
@@ -1109,10 +1128,11 @@ int main(int argc, char *argv[])
         {
             fclose(outfp);
         }
-        fprintf(stderr, "Error: A single output file may not be specified with multiple input files.\n");
+        fprintf(stderr,
+                "Error: A single output file may not be specified with "
+                "multiple input files\n");
         usage(argv[0]);
         cleanup(outfile);
-        /* For security reasons, erase the password */
         memset_secure(pass, 0, MAX_PASSWD_BUF);
         return -1;
     }
@@ -1129,10 +1149,11 @@ int main(int argc, char *argv[])
                 {
                     fclose(outfp);
                 }
-                fprintf(stderr, "Error: STDIN may not be specified with multiple input files.\n");
+                fprintf(stderr,
+                        "Error: STDIN may not be specified with multiple input "
+                        "files\n");
                 usage(argv[0]);
                 cleanup(outfile);
-                /* For security reasons, erase the password */
                 memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return -1;
             }
@@ -1151,11 +1172,10 @@ int main(int argc, char *argv[])
             fprintf(stderr, "Error opening input file %s : ", infile);
             perror("");
             cleanup(outfile);
-            /* For security reasons, erase the password */
             memset_secure(pass, 0, MAX_PASSWD_BUF);
             return -1;
         }
-        
+
         if (mode == ENC)
         {
             if (outfp == NULL)
@@ -1170,12 +1190,11 @@ int main(int argc, char *argv[])
                     fprintf(stderr, "Error opening output file %s : ", outfile);
                     perror("");
                     cleanup(outfile);
-                    /* For security reasons, erase the password */
                     memset_secure(pass, 0, MAX_PASSWD_BUF);
                     return -1;
                 }
             }
-            
+
             rc = encrypt_stream(infp, outfp, pass, passlen);
         }
         else if (mode == DEC)
@@ -1194,19 +1213,18 @@ int main(int argc, char *argv[])
                     fprintf(stderr, "Error opening output file %s : ", outfile);
                     perror("");
                     cleanup(outfile);
-                    /* For security reasons, erase the password */
                     memset_secure(pass, 0, MAX_PASSWD_BUF);
                     return -1;
                 }
             }
-            
+
             /*
              * should probably test against ascii, utf-16le, and utf-16be
              * encodings
              */
             rc = decrypt_stream(infp, outfp, pass, passlen);
         }
-        
+
         if ((infp != stdin) && (infp != NULL))
         {
             fclose(infp);
@@ -1228,12 +1246,11 @@ int main(int argc, char *argv[])
         if (rc)
         {
             cleanup(outfile);
-            /* For security reasons, erase the password */
             memset_secure(pass, 0, MAX_PASSWD_BUF);
             return -1;
         }
 
-        /* Reset input/output file names and desriptors */
+        /* Reset input/output file names and descriptors */
         outfile[0] = '\0';
         infp = NULL;
         outfp = NULL;
@@ -1241,6 +1258,6 @@ int main(int argc, char *argv[])
 
     /* For security reasons, erase the password */
     memset_secure(pass, 0, MAX_PASSWD_BUF);
-    
+
     return rc;
 }

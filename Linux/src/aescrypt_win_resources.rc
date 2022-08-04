@@ -30,7 +30,7 @@ BEGIN
             VALUE "FileDescription", "AES Crypt Executable"
             VALUE "FileVersion", PACKAGE_VERSION ".0"
             VALUE "InternalName", "AESCrypt"
-            VALUE "LegalCopyright", "Copyright © 2008"
+            VALUE "LegalCopyright", "Copyright © 2022"
             VALUE "ProductName", "AES Crypt"
             VALUE "ProductVersion", PACKAGE_VERSION ".0"
         END

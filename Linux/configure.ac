@@ -1,5 +1,5 @@
 # AES Crypt
-# Copyright (C) 2007, 2008, 2009, 2013
+# Copyright (C) 2007, 2008, 2009, 2013, 2022
 # Copyright (C) 2013, 2014 Alon Bar-Lev <alon.barlev@gmail.com>
 #
 # This software is licensed as "freeware."  Permission to distribute
@@ -14,13 +14,13 @@
 
 AC_PREREQ(2.60)
 
-AC_INIT([aescrypt], [3.0.11_master])
-AC_DEFINE([AESCRYPT_VERSION_RESOURCE], [3,0,11,0], [Version in windows resource format])
+AC_INIT([aescrypt], [3.16.1])
+AC_DEFINE([AESCRYPT_VERSION_RESOURCE], [3,16,1,0], [Version in windows resource format])
 PACKAGE_RPM_RELEASE=1
 AC_SUBST([PACKAGE_RPM_RELEASE])
 
 AC_CONFIG_AUX_DIR([.])
-AM_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR([src/aescrypt.c])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE

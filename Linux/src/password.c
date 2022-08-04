@@ -1,6 +1,6 @@
 /*
  * AES Crypt for Linux
- * Copyright (C) 2007-2017
+ * Copyright (C) 2007-2022
  *
  * Contributors:
  *     Glenn Washburn <crass@berlios.de>
@@ -82,7 +82,6 @@ const char* read_password_error(int error)
  *    >= 0 the password length (0 if empty password is in input)
  *    < 0 error (return value indicating the specific error)
  */
-
 int read_password(unsigned char* buffer, encryptmode_t mode)
 {
 #ifndef WIN32
@@ -110,16 +109,10 @@ int read_password(unsigned char* buffer, encryptmode_t mode)
 #ifndef WIN32
     /* Open the tty */
     ftty = fopen("/dev/tty", "r+");
-    if (ftty == NULL)
-    {
-        return AESCRYPT_READPWD_FOPEN;
-    }
+    if (ftty == NULL) return AESCRYPT_READPWD_FOPEN;
     tty = fileno(ftty);
-    if (tty < 0)
-    {
-        return AESCRYPT_READPWD_FILENO;
-    }
- 
+    if (tty < 0) return AESCRYPT_READPWD_FILENO;
+
     /* Get the tty attrs */
     if (tcgetattr(tty, &t) < 0)
     {
@@ -222,8 +215,7 @@ int read_password(unsigned char* buffer, encryptmode_t mode)
             /* For security reasons, erase the password */
             memset_secure(pwd, 0, MAX_PASSWD_BUF);
             memset_secure(pwd_confirm, 0, MAX_PASSWD_BUF);
-            if (ftty != stderr)
-                fclose(ftty);
+            if (ftty != stderr) fclose(ftty);
             return AESCRYPT_READPWD_FGETC;
         }
 
@@ -236,26 +228,25 @@ int read_password(unsigned char* buffer, encryptmode_t mode)
             /* For security reasons, erase the password */
             memset_secure(pwd, 0, MAX_PASSWD_BUF);
             memset_secure(pwd_confirm, 0, MAX_PASSWD_BUF);
-            if (ftty != stderr)
-                fclose(ftty);
+            if (ftty != stderr) fclose(ftty);
             return AESCRYPT_READPWD_TOOLONG;
         }
     }
 
     /* Close the tty */
-    if (ftty != stderr)
-        fclose(ftty);
+    if (ftty != stderr) fclose(ftty);
 
     /* Password must be compared only when encrypting */
     if (mode == ENC)
     {
         /* Check if passwords match */
-        match = strcmp((char*)pwd, (char*)pwd_confirm);
+        match = strcmp((char *) pwd, (char *) pwd_confirm);
+
+        /* For security reasons, erase confirm buffer */
         memset_secure(pwd_confirm, 0, MAX_PASSWD_BUF);
 
         if (match != 0)
         {
-            /* For security reasons, erase the password */
             memset_secure(pwd, 0, MAX_PASSWD_BUF);
             return AESCRYPT_READPWD_NOMATCH;
         }
@@ -264,11 +255,7 @@ int read_password(unsigned char* buffer, encryptmode_t mode)
 #ifdef WIN32
     chars_read *= 2;
 #else
-    chars_read = passwd_to_utf16(
-       pwd,
-       chars_read,
-       MAX_PASSWD_LEN,
-       buffer);
+    chars_read = passwd_to_utf16(pwd, chars_read, MAX_PASSWD_LEN, buffer);
 
     if (chars_read < 0) {
         memset_secure(pwd_confirm, 0, MAX_PASSWD_BUF);
@@ -290,17 +277,22 @@ int passwd_to_utf16(unsigned char *in_passwd,
                     int max_length,
                     unsigned char *out_passwd)
 {
+    // Perform a password length check before proceeding
+    if (length > max_length)
+    {
+        fprintf(stderr, "Error: password too long\n");
+        return -1;
+    }
+
 #ifdef WIN32
     int ret;
     (void)length;
-    ret = MultiByteToWideChar(
-        CP_ACP,
-        0,
-        (LPCSTR)in_passwd,
-        -1,
-        (LPWSTR)out_passwd,
-        max_length / 2
-    );
+    ret = MultiByteToWideChar(CP_ACP,
+                              0,
+                              (LPCSTR) in_passwd,
+                              -1,
+                              (LPWSTR) out_passwd,
+                              max_length / 2);
     if (ret == 0)
         return AESCRYPT_READPWD_ICONV;
     return ret * 2;
@@ -308,11 +300,12 @@ int passwd_to_utf16(unsigned char *in_passwd,
 #ifndef ENABLE_ICONV
     /* support only latin */
     int i;
-    for (i=0;i<length+1;i++) {
-        out_passwd[i*2] = in_passwd[i];
-        out_passwd[i*2+1] = 0;
+    for (i = 0; i < length + 1; i++)
+    {
+        out_passwd[i * 2] = in_passwd[i];
+        out_passwd[i * 2 + 1] = 0;
     }
-    return length*2;
+    return length * 2;
 #else
     unsigned char *ic_outbuf,
                   *ic_inbuf;

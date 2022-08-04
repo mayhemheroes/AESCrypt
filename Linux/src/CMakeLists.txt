@@ -1,25 +1,44 @@
-cmake_minimum_required(VERSION 3.9)
+# The iconv library is required for proper conversion from
+# system locale strings to UTF16-LE strings
+include(FindIconv)
+
+if(NOT Iconv_FOUND)
+    message(FATAL_ERROR "iconv library is not found, but required")
+endif()
 
 string(TIMESTAMP PACKAGE_DATE %Y-%m-%dT%H:%M:%SZ UTC)
-add_definitions( -DPACKAGE_NAME="aescrypt" )
-add_definitions( -DPACKAGE_VERSION="1.0.0" )
-add_definitions( -DPACKAGE_DATE="${PACKAGE_DATE}" )
 
-set( HEADER_FILES
-   password.h
-   aes.h
-   aesrandom.h
-   sha256.h
-   util.h
-   keyfile.h )
+# Build a version number into the binary library
+configure_file(version.h.in version.h @ONLY)
 
-set( COMMON_SOURCE_FILES
-   aes.c
-   aesrandom.c
-   sha256.c
-   util.c
-   keyfile.c
-   password.c )
+add_executable(aescrypt
+    aescrypt.c
+    aes.c
+    aesrandom.c
+    sha256.c
+    util.c
+    keyfile.c
+    password.c)
+target_compile_definitions(aescrypt PRIVATE ENABLE_ICONV)
+target_include_directories(aescrypt
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+target_link_libraries(aescrypt PRIVATE Iconv::Iconv)
 
-add_executable( aescrypt aescrypt.c ${COMMON_SOURCE_FILES} )
-add_executable( aescrypt_keygen aescrypt_keygen.c ${COMMON_SOURCE_FILES} )
+add_executable(aescrypt_keygen
+    aescrypt_keygen.c
+    aes.c
+    aesrandom.c
+    sha256.c
+    util.c
+    keyfile.c
+    password.c)
+target_compile_definitions(aescrypt_keygen PRIVATE ENABLE_ICONV)
+target_include_directories(aescrypt_keygen
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+target_link_libraries(aescrypt_keygen PRIVATE Iconv::Iconv)
+
+# Install target and associated include files
+install(TARGETS aescrypt aescrypt_keygen
+        RUNTIME DESTINATION bin)

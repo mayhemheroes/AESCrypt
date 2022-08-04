@@ -1,6 +1,6 @@
 /*
  *  AES Crypt Key File Generator
- *  Copyright (C) 2007-2017
+ *  Copyright (C) 2007-2022
  *  Paul E. Jones <paulej@packetizer.com>
  *
  * This software is licensed as "freeware."  Permission to distribute
@@ -24,6 +24,8 @@
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
+#else
+#include "version.h"
 #endif
 #include <stdlib.h>
 #include <stdio.h>
@@ -65,7 +67,7 @@ int generate_password(int length, unsigned char *password)
     unsigned char *p;
     int i, n;
     int passlen;
-    
+
     if ((length <= 0) || (length > MAX_PASSWD_LEN))
     {
         fprintf(stderr, "Invalid password length specified.\n");
@@ -89,16 +91,13 @@ int generate_password(int length, unsigned char *password)
     fclose(randfp);
 
     /* Now ensure each octet is uses the defined character set */
-    for(i = 0, p = pwtemp; i < length; i++, p++)
+    for (i = 0, p = pwtemp; i < length; i++, p++)
     {
         *p = pwchars[((int)(*p)) % 64];
     }
 
     /* Convert the password to UTF-16LE */
-    passlen = passwd_to_utf16(  pwtemp,
-                                length,
-                                MAX_PASSWD_LEN,
-                                password);
+    passlen = passwd_to_utf16(pwtemp, length, MAX_PASSWD_LEN, password);
 
     return passlen;
 }
@@ -182,14 +181,17 @@ int main(int argc, char *argv[])
         {
             case 'h':
                 usage(argv[0]);
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return 0;
             case 'v':
                 version(argv[0]);
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return 0;
             case 'g':
                 if (password_acquired)
                 {
                     fprintf(stderr, "Error: password supplied twice\n");
+                    memset_secure(pass, 0, MAX_PASSWD_BUF);
                     return -1;
                 }
                 if (optarg != 0)
@@ -198,6 +200,7 @@ int main(int argc, char *argv[])
                                                 pass);
                     if (passlen < 0)
                     {
+                        memset_secure(pass, 0, MAX_PASSWD_BUF);
                         return -1;
                     }
                 }
@@ -207,14 +210,15 @@ int main(int argc, char *argv[])
                 if (password_acquired)
                 {
                     fprintf(stderr, "Error: password supplied twice\n");
+                    memset_secure(pass, 0, MAX_PASSWD_BUF);
                     return -1;
                 }
                 if (optarg != 0)
                 {
-                    passlen = passwd_to_utf16(  (unsigned char*) optarg,
-                                                strlen((char *)optarg),
-                                                MAX_PASSWD_LEN,
-                                                pass);
+                    passlen = passwd_to_utf16((unsigned char *) optarg,
+                                              strlen((char *) optarg),
+                                              MAX_PASSWD_LEN,
+                                              pass);
                     if (passlen < 0)
                     {
                         return -1;
@@ -224,16 +228,16 @@ int main(int argc, char *argv[])
                 break;
             default:
                 fprintf(stderr, "Error: Unknown option '%c'\n", option);
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return -1;
         }
     }
-    
+
     file_count = argc - optind;
     if (file_count != 1)
     {
         fprintf(stderr, "Error: A single output file must be specified.\n");
         usage(argv[0]);
-        /* For security reasons, erase the password */
         memset_secure(pass, 0, MAX_PASSWD_BUF);
         return -1;
     }
@@ -253,6 +257,7 @@ int main(int argc, char *argv[])
         {
             case 0: /* no password in input */
                 fprintf(stderr, "Error: No password supplied.\n");
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return -1;
             case AESCRYPT_READPWD_FOPEN:
             case AESCRYPT_READPWD_FILENO:
@@ -263,10 +268,21 @@ int main(int argc, char *argv[])
             case AESCRYPT_READPWD_ICONV:
                 fprintf(stderr, "Error in read_password: %s.\n",
                         read_password_error(passlen));
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return -1;
             case AESCRYPT_READPWD_NOMATCH:
                 fprintf(stderr, "Error: Passwords don't match.\n");
+                memset_secure(pass, 0, MAX_PASSWD_BUF);
                 return -1;
+        }
+
+        // We should never get here, but "just in case"
+        if (passlen < 0)
+        {
+            fprintf(stderr, "Error: unexpected problem reading password\n");
+            cleanup(outfile);
+            memset_secure(pass, 0, MAX_PASSWD_BUF);
+            return -1;
         }
     }
 
@@ -278,7 +294,6 @@ int main(int argc, char *argv[])
     {
         fprintf(stderr, "Error opening output file %s : ", outfile);
         perror("");
-        /* For security reasons, erase the password */
         memset_secure(pass, 0, MAX_PASSWD_BUF);
         return  -1;
     }
@@ -296,7 +311,7 @@ int main(int argc, char *argv[])
         cleanup(outfile);
         return  -1;
     }
-    
+
     if (fwrite(pass, 1, passlen, outfp) != (size_t) passlen)
     {
         fprintf(stderr, "Error: Could not write password file.\n");
