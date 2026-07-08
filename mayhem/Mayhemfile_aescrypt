@@ -1,0 +1,6 @@
+project: aescrypt
+target: aescrypt
+
+cmds:
+  - cmd: /mayhem/aescrypt
+    libfuzzer: true

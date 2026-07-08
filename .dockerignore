@@ -1,0 +1,15 @@
+# Build outputs / local cruft
+build/
+out/
+Linux/build-test/
+Linux/build-fuzz/
+*.o
+*.a
+*.so
+*.dylib
+**/__pycache__/
+
+# Editor / OS noise
+.DS_Store
+*.swp
+*~
